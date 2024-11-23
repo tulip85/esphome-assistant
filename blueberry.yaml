@@ -82,6 +82,7 @@ esp32:
   flash_size: 16MB
   framework:
     type: esp-idf
+    version: recommended
     sdkconfig_options:
       CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240: "y"
       CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
@@ -735,7 +736,37 @@ sensor:
   - platform: homeassistant
     id: alec_temp
     entity_id: sensor.ss1_thermostat_actual_temperature_2
-    internal: true      
+    internal: true     
+
+  - platform: homeassistant
+    id: air_basement_co2
+    entity_id: sensor.airthings_basement_carbon_dioxide
+    internal: true   
+
+  - platform: homeassistant
+    id: air_basement_radon
+    entity_id: sensor.airthings_basement_radon_1_day_average
+    internal: true  
+
+  - platform: homeassistant
+    id: air_basement_vocs
+    entity_id: sensor.airthings_basement_vocs
+    internal: true     
+
+  - platform: homeassistant
+    id: air_living_co2
+    entity_id: sensor.airthings_living_carbon_dioxide
+    internal: true   
+
+  - platform: homeassistant
+    id: air_living_radon
+    entity_id: sensor.airthings_living_radon_1_day_average
+    internal: true  
+
+  - platform: homeassistant
+    id: air_living_vocs
+    entity_id: sensor.airthings_living_vocs
+    internal: true   
 
   - platform: wifi_signal
     name: "WiFi db"
@@ -831,6 +862,17 @@ text_sensor:
     id: alarm_status  
     on_value:
       - component.update: s3_box_lcd  
+
+  - platform: homeassistant
+    id: air_basement_radon_level
+    entity_id: sensor.airthings_basement_radon_1_day_level
+    internal: true  
+
+  - platform: homeassistant
+    id: air_living_radon_level
+    entity_id: sensor.airthings_living_radon_1_day_level
+    internal: true  
+
 
       
 i2s_audio:
@@ -1319,6 +1361,7 @@ font:
       - "\U000F1A1B"#gas
       - "\U000F1C3B"#battery charging/usb powered
       - "\U000F1C6F"#info
+      - "\U000F0D44"#air-quality
 
       
   - file: "https://github.com/BigBobbas/ESP32-S3-Box3-Custom-ESPHome/raw/main/fonts/materialdesignicons-webfont.ttf"
@@ -1437,14 +1480,13 @@ display:
           it.printf(250, 5, id(icon_font_55), green, "\U000F1828");
           }        
           it.printf(20, 75, id(icon_font_80), blue,"\U000F050F");
-          it.printf(40, 120, id(my_font3), white, "%.f", id(outside_temp).state);
           it.printf(120, 75, id(icon_font_80), yellow,"\U000F06E8" );
-          it.printf(220, 75, id(icon_font_80), purple,"\U000F0210");
+          it.printf(220, 75, id(icon_font_80), purple,"\U000F0D44");
           it.printf(20, 155, id(icon_font_80), red,"\U000F075A");
           it.printf(120, 155, id(icon_font_80), blue,"\U000F0FCE");
           it.printf(220, 155, id(icon_font_80), lime,"\U000F08D6");
 
-      - id: template_page ##### template page ##]##
+      - id: air_quality_page ##### template page ##]##
         lambda: |-
           it.fill(id(black));
           if(id(api_connection) == true) {
@@ -1478,12 +1520,16 @@ display:
           } else if(id(alarm_status).state == "armed_night") {
           it.printf(250, 5, id(icon_font_55), green, "\U000F1828");
           }  
-          it.printf(20, 75, id(icon_font_80), light_blue,"\U000F06E8");
-          it.printf(120, 75, id(icon_font_80), light_blue,"\U000F06E8");
-          it.printf(220, 75, id(icon_font_80), light_blue, "\U000F06E8");
-          it.printf(20, 155, id(icon_font_80), light_blue,"\U000F06E8");
-          it.printf(120, 155, id(icon_font_80), light_blue,"\U000F06E8");
-          it.printf(220, 155, id(icon_font_80), light_blue, "\U000F06E8");
+          it.printf(20, 60, id(my_font3), blue, "Air Quality");
+          it.printf(20, 100, id(my_font3), white, "Living");   
+          it.printf(20, 140, id(my_font3), white, "CO2: %.f", id(air_living_co2).state);   
+          it.printf(20, 165, id(my_font3), white, "VOCs: %.f", id(air_living_vocs).state);   
+          it.printf(20, 2190, id(my_font3), white, "Radon: %.f", id(air_living_radon).state);   
+          it.printf(180, 100, id(my_font3), white, "Basement");   
+          it.printf(180, 140, id(my_font3), white, "%.f", id(air_basement_co2).state);   
+          it.printf(180, 165, id(my_font3), white, "%.f", id(air_basement_vocs).state);   
+          it.printf(180, 190, id(my_font3), white, "%.f", id(air_basement_radon).state);   
+   
           
       - id: info_page ##### info page #####
         lambda: |-
@@ -1616,13 +1662,13 @@ display:
           } else if(id(alarm_status).state == "armed_night") {
           it.printf(250, 5, id(icon_font_55), green, "\U000F1828");
           }  
-          it.printf(20, 75, id(icon_font_80), light_blue,"\U000F050F");
-          it.printf(20, 80, id(my_font3), white, "Living: %.f", id(living_temp).state);   
-          it.printf(20, 95, id(my_font3), white, "Kitchen: %.f", id(kitchen_temp).state);   
-          it.printf(20, 110, id(my_font3), white, "Bedroom: %.f", id(master_temp).state);   
-          it.printf(20, 125, id(my_font3), white, "Nao: %.f", id(naomi_temp).state);   
-          it.printf(120, 160, id(my_font3), white, "%.f", id(eva_temp).state);   
-          it.printf(220, 160, id(my_font3), white, "%.f", id(alec_temp).state);   
+          it.printf(240, 155, id(icon_font_80), light_blue,"\U000F050F");
+          it.printf(20, 80, id(my_font3), white, "Living: %.f °C", id(living_temp).state);   
+          it.printf(20, 105, id(my_font3), white, "Kitchen: %.f °C", id(kitchen_temp).state);   
+          it.printf(20, 130, id(my_font3), white, "Bedroom: %.f °C", id(master_temp).state);   
+          it.printf(20, 155, id(my_font3), white, "Naomi: %.f °C", id(naomi_temp).state);   
+          it.printf(20, 180, id(my_font3), white, "Eva: %.f °C", id(eva_temp).state);   
+          it.printf(20, 205, id(my_font3), white, "Alec %.f °C", id(alec_temp).state);   
 
       - id: lights_page ##### lights page ####
         lambda: |-
@@ -2282,7 +2328,7 @@ binary_sensor:
       - idle_page
       - info_page
       - lights_page
-      - template_page
+      - air_quality_page
       - media_page
       - ext_media_page
       - scenes_page
@@ -2305,7 +2351,7 @@ binary_sensor:
       - idle_page
       - info_page
       - lights_page
-      - template_page
+      - air_quality_page
       - media_page
       - ext_media_page
       - scenes_page
@@ -2329,7 +2375,7 @@ binary_sensor:
       - idle_page
       - info_page
       - lights_page
-      - template_page
+      - air_quality_page
       - media_page
       - ext_media_page
       - scenes_page
@@ -2359,7 +2405,7 @@ binary_sensor:
       - idle_page
       - info_page
       - lights_page
-      - template_page
+      - air_quality_page
       - media_page
       - ext_media_page
       - scenes_page
@@ -2382,7 +2428,7 @@ binary_sensor:
       - idle_page
       - info_page
       - lights_page
-      - template_page
+      - air_quality_page
       - media_page
       - ext_media_page
       - scenes_page
@@ -2543,7 +2589,7 @@ binary_sensor:
       min_length: 10ms
       max_length: 500ms
       then:
-        - display.page.show: template_page
+        - display.page.show: air_quality_page
         - component.update: s3_box_lcd
 
   - platform: touchscreen
