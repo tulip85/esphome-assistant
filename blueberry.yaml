@@ -56,7 +56,6 @@ substitutions:
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
-  min_version: 2024.9.0
   platformio_options:
     board_build.flash_mode: dio
   on_boot:
@@ -73,16 +72,17 @@ esphome:
           then:
             media_player.volume_set:    
               id: adf_media_player
-              volume: 0 
+              volume: 0
   project:
     name: "BigBobbas.s3box"
     version: "2024.09.01"
+
+
 esp32:
   board: esp32s3box
   flash_size: 16MB
   framework:
     type: esp-idf
-    version: recommended
     sdkconfig_options:
       CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240: "y"
       CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
@@ -102,10 +102,10 @@ external_components:
   - source:
       type: git
       url: https://github.com/gnumpi/esphome_audio
-      ref: dev-next
+      ref: main
     components: [ adf_pipeline, i2s_audio ]
     refresh: 0s  
-  
+
 api:
   on_client_connected:
     - lambda: |-
@@ -950,9 +950,9 @@ microphone:
 micro_wake_word:  
   vad:
   models: 
-    - model: ${micro_wake_word_model_1}
-    - model: ${micro_wake_word_model_2}
-    - model: ${micro_wake_word_model_3}
+    #- model: ${micro_wake_word_model_1}
+    #- model: ${micro_wake_word_model_2}
+    #- model: ${micro_wake_word_model_3}
     - model: ${micro_wake_word_model_4}
   on_wake_word_detected:
     - if:
@@ -1524,7 +1524,7 @@ display:
           it.printf(20, 100, id(my_font3), white, "Living");   
           it.printf(20, 140, id(my_font3), white, "CO2: %.f", id(air_living_co2).state);   
           it.printf(20, 165, id(my_font3), white, "VOCs: %.f", id(air_living_vocs).state);   
-          it.printf(20, 2190, id(my_font3), white, "Radon: %.f", id(air_living_radon).state);   
+          it.printf(20, 190, id(my_font3), white, "Radon: %.f", id(air_living_radon).state);   
           it.printf(180, 100, id(my_font3), white, "Basement");   
           it.printf(180, 140, id(my_font3), white, "%.f", id(air_basement_co2).state);   
           it.printf(180, 165, id(my_font3), white, "%.f", id(air_basement_vocs).state);   
